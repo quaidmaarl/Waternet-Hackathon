@@ -105,11 +105,11 @@ cray_hover_hit = pdk.Layer(
     data=cray_agg,
     get_position='[longitude, latitude]',
     radius_units="pixels",
-    get_radius=25,                 # slightly larger hover area
+    get_radius=25,
     filled=True,
     stroked=False,
     get_fill_color=[0, 0, 0, 1],
-    opacity=0.01,                  # invisible
+    opacity=0.01,
     pickable=True
 )
 
@@ -136,9 +136,7 @@ deck = pdk.Deck(
     layers=[cray_heat, cray_points, cray_hover_hit, wq_points],
     initial_view_state=view,
     tooltip={"text":
-        "Type: {type}\n"
-        "Locatie: {locatie}{locatiecode}\n"
-        "Totaal aantal: {aantal}\n"
+        "Locatie: {locatiecode}\n"
         "Status: {status}"
     }
 )
