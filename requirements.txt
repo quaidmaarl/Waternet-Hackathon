@@ -3,3 +3,6 @@ pandas
 numpy
 altair
 plotly
+matplotlib
+prophet
+datetime

@@ -85,10 +85,33 @@ with col3:
               delta=f"{best_location['aantal']} Gespot")
 
 # ----------------- Tabs: Grafiek & Kaart -----------------
-tab1, tab2, tab3 = st.tabs(["Grafiek per maand", "Kaart van locaties", "Voorspelling met AI"])
+tab1, tab2, tab3, tab4 = st.tabs(["Rivierkreeften", "Grafiek per maand", "Kaart van locaties", "Voorspelling met AI"])
 
 # -------- Grafiek --------
 with tab1:
+    # text
+    st.markdown("""
+    De rivierkreeft is een exotische, invasieve soort die zijn weg naar Nederland heeft gevonden. Hoewel de rivierkreeft al sinds 2003 wordt waargenomen, is de populatie in de afgelopen vijftien jaar enorm toegenomen. Dit vormt een probleem, omdat de rivierkreeft schade toebrengt aan het lokale milieu. Hij ondermijnt de oevers en veroorzaakt daardoor erosie. Bovendien planten ze zich zeer snel voort en hebben ze nauwelijks natuurlijke vijanden. Met dit dashboard willen we niet alleen bewustwording creëren, maar ook een overzicht geven van hoe en wanneer je rivierkreeften kunt vangen en bereiden. Door ze te vangen en te eten help je actief de lokale ecosystemen in Nederland.
+    """)
+
+    st.markdown("***")
+
+    # How to prepare a crayfish
+    st.header("Hoe bereid je een rivierkreeft om te eten")
+    st.markdown("""
+    Zodra je een rivierkreeft hebt gevangen, moet je hem klaarmaken voor je maaltijd. Volg hiervoor deze stappen:
+    1. Zorg dat de rivierkreeft in een grote kom met water zit. Het is belangrijk dat hij actief en nog in leven is.
+    2. Laat hem daar 30 minuten in staan. Ververs daarna het water. Herhaal dit tot het water helder blijft.
+    3. Wanneer het water schoon is, kun je de rivierkreeft koken. Zorg dat het kookwater gezouten is. Je kunt dille, laurier en citrus toevoegen om extra smaak te geven.
+    4. Kook de rivierkreeft 3 tot 5 minuten, tot hij naar het wateroppervlak komt drijven.
+    5. Leg de kreeft vervolgens in koud water zodat hij niet verder gaart.
+    """)
+
+    # add picture
+    st.image("Picture1.jpg")
+
+             
+with tab2:
     month_map = {1:"Jan",2:"Feb",3:"Mrt",4:"Apr",5:"Mei",6:"Jun",
                  7:"Jul",8:"Aug",9:"Sep",10:"Okt",11:"Nov",12:"Dec"}
     monthly_counts['maandnaam'] = monthly_counts['maand'].map(month_map)
@@ -106,7 +129,7 @@ with tab1:
     st.altair_chart(line_chart, use_container_width=True)
 
 # -------- Kaart --------
-with tab2:
+with tab3:
     # Combineer view center
     latitudes = list(cray_agg["latitude"]) + list(wq["latitude"])
     longitudes = list(cray_agg["longitude"]) + list(wq["longitude"])
@@ -173,7 +196,7 @@ with tab2:
     st.pydeck_chart(deck)
     st.caption("Legend — Water quality: OK = green, Potential stress = yellow, In danger = red")
 
-with tab3:
+with tab4:
     # add a graph using matplotlib 
     import matplotlib.pyplot as plt
     import pandas as pd
@@ -278,7 +301,7 @@ with tab3:
 
     # Styling
     ax.set_xlabel('Date', fontsize=12)
-    ax.set_ylabel('Aantal', fontsize=12)
+    ax.set_ylabel('Amount of Crayfish ', fontsize=12)
     ax.set_title('Prophet Forecast: Historical (Blue) vs Future (Orange)', fontsize=14, fontweight='bold')
     ax.legend(loc='upper left')
     ax.grid(True, alpha=0.3)
