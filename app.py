@@ -85,7 +85,7 @@ with col3:
               delta=f"{best_location['aantal']} Gespot")
 
 # ----------------- Tabs: Grafiek & Kaart -----------------
-tab1, tab2 = st.tabs(["Grafiek per maand", "Kaart van locaties"])
+tab1, tab2, tab3 = st.tabs(["Grafiek per maand", "Kaart van locaties", "Voorspelling met AI"])
 
 # -------- Grafiek --------
 with tab1:
@@ -172,3 +172,126 @@ with tab2:
 
     st.pydeck_chart(deck)
     st.caption("Legend — Water quality: OK = green, Potential stress = yellow, In danger = red")
+
+with tab3:
+    # add a graph using matplotlib 
+    import matplotlib.pyplot as plt
+    import pandas as pd
+    data = pd.read_csv('data/RivierkreeftWaarnemingen_Cleaned.csv', index_col=False)
+
+    # format
+    data['Datum'] = pd.to_datetime(data['Datum'])
+    ai_data = data.copy()
+    ai_data.drop(columns=['Locatie', 'Longitude', 'Latitude'], inplace=True)
+
+    # simplify to Aantal per month
+    ai_data = ai_data.set_index('Datum')['Aantal'].resample('M').sum().reset_index()
+
+    # take data from 2023 - 2025
+    recent_data = ai_data.loc[(ai_data['Datum'] >= '2023-01-01') & (ai_data['Datum'] <= '2025-09-30')]
+
+    # reformat Datum to YYYY-MM
+    recent_data['Datum'] = recent_data['Datum'].dt.to_period('M').astype(str)
+
+    # remove index
+    recent_data.reset_index(drop=True, inplace=True)
+
+    from prophet import Prophet
+    # Requires columns 'ds' (dates) and 'y' (values)
+
+    recent_data.rename(columns={'Datum': 'ds', 'Aantal': 'y'}, inplace=True)
+    recent_data['ds'] = pd.to_datetime(recent_data['ds'])
+    model = Prophet()
+    model.fit(recent_data)
+
+    future = model.make_future_dataframe(periods=12, freq='M')
+    forecast = model.predict(future)
+
+    fig = model.plot(forecast)
+    plt.show()
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    from prophet import Prophet
+    from datetime import datetime
+
+    # Your existing code
+    recent_data.rename(columns={'Datum': 'ds', 'Aantal': 'y'}, inplace=True)
+    recent_data['ds'] = pd.to_datetime(recent_data['ds'])
+    model = Prophet()
+    model.fit(recent_data)
+
+    future = model.make_future_dataframe(periods=12, freq='M')
+    forecast = model.predict(future)
+
+    # Custom plotting with your requirements
+    fig, ax = plt.subplots(figsize=(12, 6))
+
+    # Get today's date
+    today = datetime.now()
+
+    # start of last month
+    today = today.replace(day=1) - pd.DateOffset(days=1)
+
+
+    # Split forecast into historical and future
+    historical_mask = forecast['ds'] <= today
+    future_mask = forecast['ds'] > today
+
+    # Alternative: More customized version with better styling
+    fig, ax = plt.subplots(figsize=(14, 7))
+
+    # Plot with different colors for past and future
+    historical_forecast = forecast[forecast['ds'] <= today]
+    future_forecast = forecast[forecast['ds'] > today]
+
+    # Historical line (blue)
+    ax.plot(historical_forecast['ds'], historical_forecast['yhat'], 
+            color='#1f77b4', linewidth=2.5, label='Historical Forecast')
+
+    # Future line (red/orange)
+    ax.plot(future_forecast['ds'], future_forecast['yhat'], 
+            color='#ff7f0e', linewidth=2.5, label='Future Forecast')
+
+    # # Actual data points
+    # ax.scatter(recent_data['ds'], recent_data['y'], 
+    #            color='black', s=40, zorder=5, alpha=0.8, label='Actual Data')
+
+    # # Confidence intervals with different colors
+    # ax.fill_between(historical_forecast['ds'], 
+    #                 historical_forecast['yhat_lower'],
+    #                 historical_forecast['yhat_upper'],
+    #                 alpha=0.2, color='#1f77b4', label='Historical Confidence')
+
+    ax.fill_between(future_forecast['ds'], 
+                    future_forecast['yhat_lower'],
+                    future_forecast['yhat_upper'],
+                    alpha=0.2, color='#ff7f0e', label='Future Confidence')
+
+    # Today line
+    ax.axvline(x=today, color='red', linestyle='--', linewidth=2, alpha=0.8, label='Today')
+
+    # Set limits with no margins
+    ax.set_xlim(recent_data['ds'].min(), forecast['ds'].max())
+    y_min = min(forecast['yhat_lower'].min(), recent_data['y'].min())
+    y_max = max(forecast['yhat_upper'].max(), recent_data['y'].max())
+    ax.set_ylim(y_min - 2, y_max + 2)  # Small buffer for readability
+
+    # Styling
+    ax.set_xlabel('Date', fontsize=12)
+    ax.set_ylabel('Aantal', fontsize=12)
+    ax.set_title('Prophet Forecast: Historical (Blue) vs Future (Orange)', fontsize=14, fontweight='bold')
+    ax.legend(loc='upper left')
+    ax.grid(True, alpha=0.3)
+
+    # Remove margins completely
+    plt.margins(0)
+    plt.tight_layout()
+    st.pyplot(fig)
+
+    # Print future predictions
+    print("\nFuture Predictions:")
+    future_predictions = forecast[forecast['ds'] > today][['ds', 'yhat', 'yhat_lower', 'yhat_upper']].head(12)
+    print(future_predictions.to_string(index=False, float_format='%.1f'))
+
+
+
