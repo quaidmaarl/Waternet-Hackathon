@@ -4,7 +4,7 @@ import altair as alt
 import pydeck as pdk
 
 st.set_page_config(layout="wide")
-st.title("Waternet Crayfish Dashboard")
+st.title("Waternet Rivierkreeft Dashboard")
 
 # ----------------- Data inladen -----------------
 cray_csv = "data/RivierkreeftWaarnemingen_Cleaned.csv"
@@ -85,7 +85,7 @@ with col3:
               delta=f"{best_location['aantal']} Gespot")
 
 # ----------------- Tabs: Grafiek & Kaart -----------------
-tab1, tab2, tab3, tab4 = st.tabs(["Rivierkreeften", "Grafiek per maand", "Kaart van locaties", "Aankomend jaar"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["Rivierkreeften", "Grafiek per maand", "Kaart van locaties", "Aankomend jaar", "Rivierkreeftrecepten"])
 
 # -------- Grafiek --------
 with tab1:
@@ -94,21 +94,9 @@ with tab1:
     De rivierkreeft is een exotische, invasieve soort die zijn weg naar Nederland heeft gevonden. Hoewel de rivierkreeft al sinds 2003 wordt waargenomen, is de populatie in de afgelopen vijftien jaar enorm toegenomen. Dit vormt een probleem, omdat de rivierkreeft schade toebrengt aan het lokale milieu. Hij ondermijnt de oevers en veroorzaakt daardoor erosie. Bovendien planten ze zich zeer snel voort en hebben ze nauwelijks natuurlijke vijanden. Met dit dashboard willen we niet alleen bewustwording creëren, maar ook een overzicht geven van hoe en wanneer je rivierkreeften kunt vangen en bereiden. Door ze te vangen en te eten help je actief de lokale ecosystemen in Nederland.
     """)
 
-    st.markdown("***")
-
-    # How to prepare a crayfish
-    st.header("Hoe bereid je een rivierkreeft om te eten")
-    st.markdown("""
-    Zodra je een rivierkreeft hebt gevangen, moet je hem klaarmaken voor je maaltijd. Volg hiervoor deze stappen:
-    1. Zorg dat de rivierkreeft in een grote kom met water zit. Het is belangrijk dat hij actief en nog in leven is.
-    2. Laat hem daar 30 minuten in staan. Ververs daarna het water. Herhaal dit tot het water helder blijft.
-    3. Wanneer het water schoon is, kun je de rivierkreeft koken. Zorg dat het kookwater gezouten is. Je kunt dille, laurier en citrus toevoegen om extra smaak te geven.
-    4. Kook de rivierkreeft 3 tot 5 minuten, tot hij naar het wateroppervlak komt drijven.
-    5. Leg de kreeft vervolgens in koud water zodat hij niet verder gaart.
-    """)
 
     # add picture
-    st.image("Picture1.jpg")
+    st.image("Crayfish.jpg")
 
              
 with tab2:
@@ -118,7 +106,7 @@ with tab2:
 
     line_chart = alt.Chart(monthly_counts).mark_line(point=True, color='teal').encode(
         x=alt.X("maandnaam:O", title="Maand"),
-        y=alt.Y("aantal", title="Aantal Crayfish"),
+        y=alt.Y("aantal", title="Aantal rivierkreeften"),
         tooltip=["maandnaam", "aantal"]
     ).properties(
         width=700,
@@ -316,5 +304,18 @@ with tab4:
     future_predictions = forecast[forecast['ds'] > today][['ds', 'yhat', 'yhat_lower', 'yhat_upper']].head(12)
     print(future_predictions.to_string(index=False, float_format='%.1f'))
 
+with tab5:
+    # How to prepare a crayfish
+    st.header("Hoe bereid je een rivierkreeft om te eten")
+    st.markdown("""
+    Zodra je een rivierkreeft hebt gevangen, moet je hem klaarmaken voor je maaltijd. Volg hiervoor deze stappen:
+    1. Zorg dat de rivierkreeft in een grote kom met water zit. Het is belangrijk dat hij actief en nog in leven is.
+    2. Laat hem daar 30 minuten in staan. Ververs daarna het water. Herhaal dit tot het water helder blijft.
+    3. Wanneer het water schoon is, kun je de rivierkreeft koken. Zorg dat het kookwater gezouten is. Je kunt dille, laurier en citrus toevoegen om extra smaak te geven.
+    4. Kook de rivierkreeft 3 tot 5 minuten, tot hij naar het wateroppervlak komt drijven.
+    5. Leg de kreeft vervolgens in koud water zodat hij niet verder gaart.
+    """)
+
+    st.image("Picture1.jpg")
 
 
