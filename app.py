@@ -85,7 +85,7 @@ with col3:
               delta=f"{best_location['aantal']} Gespot")
 
 # ----------------- Tabs: Grafiek & Kaart -----------------
-tab1, tab2, tab3, tab4 = st.tabs(["Rivierkreeften", "Grafiek per maand", "Kaart van locaties", "Voorspelling met AI"])
+tab1, tab2, tab3, tab4 = st.tabs(["Rivierkreeften", "Grafiek per maand", "Kaart van locaties", "Aankomend jaar"])
 
 # -------- Grafiek --------
 with tab1:
