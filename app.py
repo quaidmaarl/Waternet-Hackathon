@@ -16,16 +16,19 @@ dfc.columns = [c.strip().lower() for c in dfc.columns]
 dfc = dfc.rename(columns={"lat": "latitude", "lon": "longitude", "lng": "longitude"})
 for col in ["aantal", "latitude", "longitude"]:
     dfc[col] = pd.to_numeric(dfc[col], errors="coerce")
-dfc = dfc.dropna(subset=["latitude", "longitude"])
+# Convert date before any filtering
 dfc['datum'] = pd.to_datetime(dfc['datum'], errors='coerce')
 dfc['jaar'] = dfc['datum'].dt.year
 dfc['maand'] = dfc['datum'].dt.month
 
-# Aggregate near-duplicates
-dfc["lat_round"] = dfc["latitude"].round(5)
-dfc["lon_round"] = dfc["longitude"].round(5)
+# Create separate dataset for mapping (with coordinates only)
+dfc_map = dfc.dropna(subset=["latitude", "longitude"]).copy()
+
+# Aggregate near-duplicates (use mapping dataset)
+dfc_map["lat_round"] = dfc_map["latitude"].round(5)
+dfc_map["lon_round"] = dfc_map["longitude"].round(5)
 cray_agg = (
-    dfc.groupby(["locatie", "lat_round", "lon_round"], as_index=False)["aantal"]
+    dfc_map.groupby(["locatie", "lat_round", "lon_round"], as_index=False)["aantal"]
     .sum()
     .rename(columns={"lat_round": "latitude", "lon_round": "longitude"})
 )
