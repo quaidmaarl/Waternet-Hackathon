@@ -105,10 +105,17 @@ with tab1:
 with tab2:
     month_map = {1:"Jan",2:"Feb",3:"Mrt",4:"Apr",5:"Mei",6:"Jun",
                  7:"Jul",8:"Aug",9:"Sep",10:"Okt",11:"Nov",12:"Dec"}
-    monthly_counts['maandnaam'] = monthly_counts['maand'].map(month_map)
+    
+    # Maak een complete dataset met alle 12 maanden
+    all_months = pd.DataFrame({'maand': range(1, 13)})
+    
+    # Merge met de bestaande data, vul ontbrekende maanden met 0
+    complete_monthly = all_months.merge(monthly_counts, on='maand', how='left')
+    complete_monthly['aantal'] = complete_monthly['aantal'].fillna(0)
+    complete_monthly['maandnaam'] = complete_monthly['maand'].map(month_map)
 
-    line_chart = alt.Chart(monthly_counts).mark_line(point=True, color='teal').encode(
-        x=alt.X("maandnaam:O", title="Maand"),
+    line_chart = alt.Chart(complete_monthly).mark_line(point=True, color='teal').encode(
+        x=alt.X("maandnaam:O", title="Maand", sort=['Jan','Feb','Mrt','Apr','Mei','Jun','Jul','Aug','Sep','Okt','Nov','Dec']),
         y=alt.Y("aantal", title="Aantal rivierkreeften"),
         tooltip=["maandnaam", "aantal"]
     ).properties(
